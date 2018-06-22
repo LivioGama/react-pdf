@@ -255,18 +255,24 @@ class Base {
   async fillRemainingSpace(page, element, availableHeight) {
     if (element.canBeSplitted) {
       const getHeight = value => {
-        element.setFontSize();
-        const elementMargin = element.getMargin();
-        const elementPadding = element.getPadding();
+        if (element.constructor.name === 'Text') {
+          element.setFontSize();
+          const elementMargin = element.getMargin();
+          const elementPadding = element.getPadding();
 
-        return this.root.heightOfString(value, {
-          width:
-            this.getWidth() -
-            elementMargin.right -
-            elementMargin.left -
-            elementPadding.right -
-            elementPadding.left,
-        });
+          return this.root.heightOfString(value, {
+            width:
+              this.getWidth() -
+              elementMargin.right -
+              elementMargin.left -
+              elementPadding.right -
+              elementPadding.left,
+          });
+        } else {
+          return this.root.heightOfString(value, {
+            width: this.getWidth(),
+          });
+        }
       };
 
       const newElement = splitElement(element, availableHeight, getHeight);
@@ -352,7 +358,7 @@ class Base {
   }
 
   async renderChildren(page) {
-    if (page.props.wrap) {
+    if (page && page.props.wrap) {
       await this.renderWrapChildren(page);
     } else {
       await this.renderPlainChildren(page);

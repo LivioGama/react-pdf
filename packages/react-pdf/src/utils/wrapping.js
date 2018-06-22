@@ -38,20 +38,35 @@ export const chunkString = (string, availableHeight, getHeight) => {
 
 // Given an element and an availableHeight, returns a new element that fits
 // into it and edits the original one with the remaining content
-// TODO: split nested children
 export const splitElement = (element, availableHeight, getHeight) => {
-  const newElement = element.clone();
-  const margin = element.getMargin();
-  const padding = element.getPadding();
+  if (element.constructor.name === 'Text') {
+    const newElement = element.clone();
+    const margin = element.getMargin();
+    const padding = element.getPadding();
 
-  const lines = chunkString(
-    element.getRawValue(),
-    availableHeight - padding.top - padding.bottom - margin.top - margin.bottom,
-    getHeight,
-  );
+    const lines = chunkString(
+      element.getRawValue(),
+      availableHeight -
+        padding.top -
+        padding.bottom -
+        margin.top -
+        margin.bottom,
+      getHeight,
+    );
 
-  newElement.children = [lines[0]];
-  element.children = [lines[1]];
+    newElement.children = [lines[0]];
+    element.children = [lines[1]];
 
-  return newElement;
+    return newElement;
+  } else {
+    // In this case, we are trying to split a View
+    const newElement = element.clone();
+    newElement.children = [];
+    for (let i = 0; i < element.children.length; i++) {
+      const child = element.children[i];
+      const newNewElement = splitElement(child, availableHeight, getHeight);
+      newElement.children.push(newNewElement);
+    }
+    return newElement;
+  }
 };

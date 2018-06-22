@@ -5,6 +5,11 @@ class View extends Base {
     style: {},
   };
 
+  constructor(root, props) {
+    super(root, props);
+    this.canBeSplitted = true;
+  }
+
   async render(page) {
     this.drawBackgroundColor();
     this.drawBorders();
